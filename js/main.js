@@ -2,7 +2,7 @@
 var width = 400;
 var height = 300;
 var lightPos = Vec3(5, 5, -10);
-var light_color = Vec3(1, 1, 1);
+var light_color = Vec3(255, 255, 255);
 
 // Default light and material parameters.
 var ambient = 0.05;
@@ -20,7 +20,7 @@ var inf = 100;
 /*global variables*/
 var scene = [add_plane(Vec3(0, -5, 0), Vec3(0, 1, 0)),
             add_sphere(Vec3(0.8, 0.1, 1), 0.6, Vec3(0, 0, 255)),
-            add_sphere(Vec3(0, 0.1, 1), 0.6, Vec3(0, 255, 0))
+            add_sphere(Vec3(-0.2, 0.1, 1.5), 0.6, Vec3(0, 255, 0))
             ];
     //.75, .1, 1.], .6, [0., 0., 1.]
 
@@ -136,7 +136,10 @@ function traceRay(ray) {
     var NtoL = dot(N, toL);
     //printVec3(M);    
     var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
-    rayColor = addVec3(rayColor, extendVec3(surfaceColor, diffuseFactor));
+    var specularFactor = obj.specular_c * Math.max(dot(N, normalize(addVec3(toL, toO))), 0) ** specular_k;
+    var specularColor = extendVec3(light_color, specularFactor);  
+    
+    rayColor = addVec3(rayColor, addVec3(extendVec3(surfaceColor, diffuseFactor), specularColor));
     return hit(obj, M, N, rayColor);
 }
 
@@ -175,7 +178,7 @@ function render(maxDepth) {
             pixelData[x][y].r = pixelColor.x;
             pixelData[x][y].g = pixelColor.y;
             pixelData[x][y].b = pixelColor.z;
-        }
+        }        
     }
     displayImage(pixelData);
 }
