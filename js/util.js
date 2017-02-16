@@ -11,10 +11,11 @@ function getCurrentTime() {
 
 function createBackgroundImage() {    
     var pixelData = [];
+    var nom = 230/height;
     for (var x = 0; x < width; x++) {
         pixelData[x] = [];
         for (var y = 0; y < height; y++) {
-            pixelData[x][y] = color(0,0,0);            
+            pixelData[x][y] = color(0,0,230-y*nom);            
         }
     }
     return pixelData;
@@ -23,6 +24,8 @@ function createBackgroundImage() {
 /*Displays image*/
 function displayImage(pixelData){
     var c2 = document.getElementById("myCanvas");
+    c2.width = width;
+    c2.height = height;
     var ctx2 = c2.getContext("2d");
 
     var c1 = document.createElement("canvas");
@@ -41,7 +44,7 @@ function displayImage(pixelData){
         imgData.data[i + 3] = 255;
     }
     ctx1.putImageData(imgData, 0, 0);
-
+    //debug stretch image
     c2.width = 400;
     c2.height = 300;
 
