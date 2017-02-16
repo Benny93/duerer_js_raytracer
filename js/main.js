@@ -20,7 +20,8 @@ var inf = 100;
 /*global variables*/
 var scene = [add_plane(Vec3(0, -5, 0), Vec3(0, 1, 0)),
             add_sphere(Vec3(0.8, 0.1, 1), 0.6, Vec3(0, 0, 255)),
-            add_sphere(Vec3(-0.2, 0.1, 1.5), 0.6, Vec3(0, 255, 0))
+            add_sphere(Vec3(-0.2, 0.1, 1.5), 0.6, Vec3(0, 255, 0)),
+            add_sphere(Vec3(-1.2, 0.8, 1.5), 0.6, Vec3(255, 0, 0))
             ];
     //.75, .1, 1.], .6, [0., 0., 1.]
 
