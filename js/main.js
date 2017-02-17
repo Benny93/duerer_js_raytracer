@@ -23,7 +23,7 @@ var castShadows = 0; //0: false, 1:true
 /*global variables*/
 var scene = [add_plane(Vec3(0, -5, 0), Vec3(0, 1, 0)),
             add_sphere(Vec3(0.8, 0.1, 1), 0.6, Vec3(0, 0, 255)),
-            add_sphere(Vec3(-0.2, 0.1, 1.5), 0.6, Vec3(0, 255, 0)),
+            add_sphere(Vec3(0, 0.1, 2), 0.6, Vec3(0, 255, 0)),
             add_sphere(Vec3(-1.2, 0.8, 1.5), 0.6, Vec3(255, 0, 0))
             ];
 //.75, .1, 1.], .6, [0., 0., 1.]
@@ -168,6 +168,7 @@ function render(maxDepth) {
     println('Time: ' + getCurrentTime());
     println('Redering with depth ' + maxDepth + '!');
     printInfo();
+    var start_ms = new Date().getTime();
     //fetch settings
     shaderType = document.getElementsByName('shaderType')[0].value;
     //create background image
@@ -204,4 +205,8 @@ function render(maxDepth) {
         }
     }
     displayImage(pixelData);
+    
+    var end_ms = new Date().getTime();
+    var passedTime_ms = end_ms - start_ms;
+    println("Finished in: " + passedTime_ms/1000 + " seconds");
 }
