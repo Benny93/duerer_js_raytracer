@@ -17,7 +17,7 @@ function printInfo() {
     println('Light pos ' + lightPos.y);
     var A = Vec3(1, 1, 1);
     var dotA = dot(A, A);
-
+    println("Shader Type " + shaderType);
 }
 
 function printVec3(vector){

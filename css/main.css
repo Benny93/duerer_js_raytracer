@@ -96,18 +96,36 @@ textarea {
    ========================================================================== */
 
 
+.mainWrapper{    
+    margin: 0 auto;
+    max-width: 1400px;
+    display: flex;
+    
+    min-height: 600px;
+    border: solid 1px;
+    border-color: black;
+    
+}
 
+#leftColumn{
+    /*max-width: 600px;*/
+    min-width: 600px;       
+    padding: 20px;
+    /*background-color: RGB(129,129,129);color: white;*/
+    text-align: center;
+}
+#rightColumn{
+    background-color: #EEE;
+    padding: 20px;
+    /*max-width: 600px;*/
+    flex: 1;
+}
 
-
-
-
-
-
-
-
-
-
-
+#myCanvas{
+    border: solid 1px;
+    border-color: black;
+    
+}
 
 
 

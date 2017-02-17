@@ -17,13 +17,16 @@ var Q = Vec3(0, 0, 0); // Camera pointing to.
 //max raydepth
 var inf = 100;
 
+var shaderType = document.getElementsByName('shaderType')[0].value; //0:debug , 1: diffuse+Blinn
+var castShadows = 0; //0: false, 1:true
+
 /*global variables*/
 var scene = [add_plane(Vec3(0, -5, 0), Vec3(0, 1, 0)),
             add_sphere(Vec3(0.8, 0.1, 1), 0.6, Vec3(0, 0, 255)),
             add_sphere(Vec3(-0.2, 0.1, 1.5), 0.6, Vec3(0, 255, 0)),
             add_sphere(Vec3(-1.2, 0.8, 1.5), 0.6, Vec3(255, 0, 0))
             ];
-    //.75, .1, 1.], .6, [0., 0., 1.]
+//.75, .1, 1.], .6, [0., 0., 1.]
 
 function intersectPlane(ray, position, normal) {
     //denominator
@@ -85,17 +88,34 @@ function getNormal(obj, intersectionPoint) {
         return obj.normal;
     }
     if (obj.type.localeCompare("sphere") == 0) {
-        return normalize(subVec3(intersectionPoint,obj.position));
+        return normalize(subVec3(intersectionPoint, obj.position));
     }
 }
 
 function getColor(obj, intersectionPoint) {
-    if (obj.type.localeCompare("plane") == 0) {        
+    if (obj.type.localeCompare("plane") == 0) {
         return obj.s_color;
     }
     if (obj.type.localeCompare("sphere") == 0) {
         return obj.s_color;
     }
+}
+
+function shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor) {
+    var rayColor = extendVec3(surfaceColor, ambient);
+    // Lambert shading (diffuse). -> diffuseColor * cos(theta) * color
+    var NtoL = dot(N, toL);
+    //printVec3(M);    
+    var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
+    var specularFactor = obj.specular_c * Math.max(dot(N, normalize(addVec3(toL, toO))), 0) ** specular_k;
+    var specularColor = extendVec3(light_color, specularFactor);
+
+    rayColor = addVec3(rayColor, addVec3(extendVec3(surfaceColor, diffuseFactor), specularColor));
+    return rayColor;
+}
+
+function shadeDebug(N) {
+    return Vec3(Math.abs(N.x) * 255, Math.abs(N.y) * 255, Math.abs(N.z) * 255);
 }
 
 function traceRay(ray) {
@@ -120,27 +140,26 @@ function traceRay(ray) {
     var surfaceColor = getColor(obj, M);
     var toL = normalize(subVec3(lightPos, M)); //zum licht
     var toO = normalize(subVec3(O, M));
-    // Shadow: find if the point is shadowed or not.
-    var shadowRay = createRay(addVec3(M, N * 0.0001), toL);
-    for (var i = 0; i < scene.length; i++) {
-        if (i !== objIndex) {
-            var objT = intersect(ray, scene[i]);
-            if (objT < inf) {
-                return; //shadow ray hit something -> shadow
+    if (castShadows !== 0) {
+        // Shadow: find if the point is shadowed or not.
+        var shadowRay = createRay(addVec3(M, extendVec3(N, 0.001)), toL);
+        for (var i = 0; i < scene.length; i++) {
+            if (i !== objIndex) {
+                var objT = intersect(ray, scene[i]);
+                if (objT < inf) {
+                    return; //shadow ray hit something -> shadow
+                }
             }
         }
     }
     //no shadow
     //Start computing the color.
-    var rayColor = Vec3(ambient, ambient, ambient);
-    // Lambert shading (diffuse). -> diffuseColor * cos(theta) * color
-    var NtoL = dot(N, toL);
-    //printVec3(M);    
-    var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
-    var specularFactor = obj.specular_c * Math.max(dot(N, normalize(addVec3(toL, toO))), 0) ** specular_k;
-    var specularColor = extendVec3(light_color, specularFactor);  
-    
-    rayColor = addVec3(rayColor, addVec3(extendVec3(surfaceColor, diffuseFactor), specularColor));
+    var rayColor;
+    if (shaderType == 1) {
+        rayColor = shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor);
+    } else {
+        rayColor = shadeDebug(N);
+    }
     return hit(obj, M, N, rayColor);
 }
 
@@ -149,12 +168,15 @@ function render(maxDepth) {
     println('Time: ' + getCurrentTime());
     println('Redering with depth ' + maxDepth + '!');
     printInfo();
+    //fetch settings
+    shaderType = document.getElementsByName('shaderType')[0].value;
+    //create background image
     var pixelData = createBackgroundImage();
     var r = width / height;
     // Screen coordinates: x0, y0, x1, y1.
     var S = [-1, -1 / r + .25, 1, 1 / r + .25];
     var xStepSize = (Math.abs(S[0]) + S[2]) / width;
-    var yStepSize = (Math.abs(S[1]) + S[3]) / height;    
+    var yStepSize = (Math.abs(S[1]) + S[3]) / height;
     var imagePlanePoint;
     for (var x = 0; x < width; x++) {
         for (var y = 0; y < height; y++) {
@@ -179,7 +201,7 @@ function render(maxDepth) {
             pixelData[x][y].r = pixelColor.x;
             pixelData[x][y].g = pixelColor.y;
             pixelData[x][y].b = pixelColor.z;
-        }        
+        }
     }
     displayImage(pixelData);
 }
