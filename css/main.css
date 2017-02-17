@@ -130,7 +130,7 @@ textarea {
     background-color: #393939;
     color: white;
     padding: 5px;
-    height: 90%;
+    min-height: 400px;
 }
 
 
