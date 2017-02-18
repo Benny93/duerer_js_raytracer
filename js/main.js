@@ -44,7 +44,7 @@ function intersectPlane(ray, position, normal) {
 
 function intersectSphere(ray, position, radius) {
     //using Quadratic equation
-    var a = dot(ray.direction, ray.direction) // length of ray dir
+    var a = dot(ray.direction, ray.direction) // length of ray dir    
     var originToSphere = subVec3(ray.origin, position); // direction from sphere center to origin
     var b = 2 * dot(ray.direction, originToSphere);
     var c = dot(originToSphere, originToSphere) - radius * radius;
