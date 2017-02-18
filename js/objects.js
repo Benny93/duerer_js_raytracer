@@ -1,3 +1,7 @@
+var defaultBlack = Vec3(255, 255, 255);
+var defaultWhite = Vec3(0, 0, 0);
+var defaultBlue = Vec3 (0,0,255);
+
 function Vec3(x, y, z) {
     return {
         "x": x,
@@ -64,16 +68,18 @@ function color(_r, _g, _b) {
         "b": _b
     }
 }
-var colorPlane0 = color(255, 255, 255);
-var colorPlane1 = color(0, 0, 0);
 
-var planeColorFunction =
+
+var planeCheckBoard =
     function getPlaneColorAtPoint(point) {
-        if ((Math.floor(point.x * 2) % 2) === (Math.floor(point.z * 2) % 2)) {
-            return colorPlane0;
+        /*printVec3(point);
+        println("lhs " + (Math.floor(point.x * 2) % 2));
+        println("rhs " + (Math.floor(point.z * 2) % 2));*/
+        if ((Math.floor(point.x * 2) % 2) == (Math.floor(point.z * 2) % 2)) {          
+            return defaultWhite;
         } else {
-            return colorPlane1;
-        }
+            return defaultBlue;
+        }        
     }
 
 
@@ -84,6 +90,7 @@ function add_plane(position, normal) {
         "position": position,
         "normal": normal,
         "s_color": Vec3(255, 255, 255),
+        "checkerBoard": planeCheckBoard,
         "diffuse_c": 0.75,
         "specular_c": 0.5,
         "reflection": 0.25

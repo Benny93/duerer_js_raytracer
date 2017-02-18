@@ -22,10 +22,10 @@ var castShadows = 0; //0: false, 1:true
 
 /*global variables*/
 var scene = [
-            add_sphere(Vec3(0.8, 0.1, 1), 0.6, Vec3(0, 0, 255)),
+            add_sphere(Vec3(0.8, 0, 1), 0.6, Vec3(0, 0, 255)),
             add_sphere(Vec3(0, 0.1, 2), 0.6, Vec3(0, 255, 0)),
             add_sphere(Vec3(-1.2, 0.8, 1.5), 0.6, Vec3(255, 0, 0)),
-            add_plane(Vec3(0, -5, 0), Vec3(0, 1, 0))
+            add_plane(Vec3(0, -0.5, 0), Vec3(0, 1, 0))
             ];
 //.75, .1, 1.], .6, [0., 0., 1.]
 
@@ -95,7 +95,8 @@ function getNormal(obj, intersectionPoint) {
 
 function getColor(obj, intersectionPoint) {
     if (obj.type.localeCompare("plane") == 0) {
-        return obj.s_color;
+        //return obj.s_color;
+        return obj.checkerBoard(intersectionPoint);
     }
     if (obj.type.localeCompare("sphere") == 0) {
         return obj.s_color;
@@ -103,12 +104,12 @@ function getColor(obj, intersectionPoint) {
 }
 
 function shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor) {
-    var rayColor = scaleVec3(surfaceColor, ambient);
+    var rayColor = scaleVec3(surfaceColor, ambient);    
     // Lambert shading (diffuse). -> diffuseColor * cos(theta) * color
     var NtoL = dot(N, toL);
     //printVec3(M);    
     var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
-    var specularFactor = obj.specular_c * Math.max(dot(N, normalize(addVec3(toL, toO))), 0) ** specular_k;
+    var specularFactor = obj.specular_c * Math.pow(Math.max(dot(N, normalize(addVec3(toL, toO))), 0), specular_k);
     var specularColor = scaleVec3(light_color, specularFactor);
 
     rayColor = addVec3(rayColor, addVec3(scaleVec3(surfaceColor, diffuseFactor), specularColor));
@@ -147,7 +148,7 @@ function traceRay(ray) {
         for (var i = 0; i < scene.length; i++) {
             if (i !== objIndex) {
                 var objT = intersect(shadowRay, scene[i]);
-                if (objT < inf) {                
+                if (objT < inf) {
                     return; //shadow ray hit something -> shadow
                 }
             }
@@ -191,7 +192,7 @@ function render(maxDepth) {
             var depth = 0;
             var D = normalize(subVec3(imagePlanePoint, O));
             var ray = createRay(O, D);
-            var relfection = 1;
+            var reflection = 1; //perfect reflection for first ray color
             var pixelColor = Vec3(0, 0, 0);
             //trace
             while (depth < maxDepth) {
@@ -199,7 +200,16 @@ function render(maxDepth) {
                 if (typeof traced === 'undefined') {
                     break;
                 }
-                //if(traced.object                 
+                //calculate reflection ray for next iteration
+                var reflectionDir = subVec3(ray.direction, scaleVec3(traced.normal, 2 * dot(ray.direction, traced.normal)));
+                //override old ray
+
+                ray.origin = addVec3(traced.hitPoint, scaleVec3(traced.normal, 0.0001));
+                ray.direction = reflectionDir;
+                //add color from traced
+                var colorAmount = scaleVec3(traced.rayColor, reflection);
+                //reduce reflection intesity to the propertys of traced obj
+                reflection = traced.object.reflection;
                 pixelColor = addVec3(pixelColor, traced.rayColor);
                 depth++;
             }
