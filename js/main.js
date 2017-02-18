@@ -1,6 +1,6 @@
-//settings
-var width = 400;
-var height = 300;
+//settings, some will be overritten by ui
+var width = 40; //400x300
+var height = 30;
 var lightPos = Vec3(5, 5, -10);
 var light_color = Vec3(255, 255, 255);
 
@@ -21,10 +21,11 @@ var shaderType = document.getElementsByName('shaderType')[0].value; //0:debug , 
 var castShadows = 0; //0: false, 1:true
 
 /*global variables*/
-var scene = [add_plane(Vec3(0, -5, 0), Vec3(0, 1, 0)),
+var scene = [
             add_sphere(Vec3(0.8, 0.1, 1), 0.6, Vec3(0, 0, 255)),
             add_sphere(Vec3(0, 0.1, 2), 0.6, Vec3(0, 255, 0)),
-            add_sphere(Vec3(-1.2, 0.8, 1.5), 0.6, Vec3(255, 0, 0))
+            add_sphere(Vec3(-1.2, 0.8, 1.5), 0.6, Vec3(255, 0, 0)),
+            add_plane(Vec3(0, -5, 0), Vec3(0, 1, 0))
             ];
 //.75, .1, 1.], .6, [0., 0., 1.]
 
@@ -45,9 +46,9 @@ function intersectPlane(ray, position, normal) {
 function intersectSphere(ray, position, radius) {
     //using Quadratic equation
     var a = dot(ray.direction, ray.direction) // length of ray dir    
-    var originToSphere = subVec3(ray.origin, position); // direction from sphere center to origin
-    var b = 2 * dot(ray.direction, originToSphere);
-    var c = dot(originToSphere, originToSphere) - radius * radius;
+    var sphereToOrigin = subVec3(ray.origin, position); // direction from sphere center to origin
+    var b = 2 * dot(ray.direction, sphereToOrigin);
+    var c = dot(sphereToOrigin, sphereToOrigin) - radius * radius;
     var discriminant = b * b - 4 * a * c; // discriminate from midnight formula    
     if (discriminant > 0) { // there is at least one result
         var disc_sqrt = Math.sqrt(discriminant)
@@ -69,7 +70,7 @@ function intersectSphere(ray, position, radius) {
             }
         }
     }
-    return inf //there is no result and therefore no hitpoint
+    return inf; //there is no result and therefore no hitpoint
 
 }
 
@@ -102,15 +103,15 @@ function getColor(obj, intersectionPoint) {
 }
 
 function shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor) {
-    var rayColor = extendVec3(surfaceColor, ambient);
+    var rayColor = scaleVec3(surfaceColor, ambient);
     // Lambert shading (diffuse). -> diffuseColor * cos(theta) * color
     var NtoL = dot(N, toL);
     //printVec3(M);    
     var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
     var specularFactor = obj.specular_c * Math.max(dot(N, normalize(addVec3(toL, toO))), 0) ** specular_k;
-    var specularColor = extendVec3(light_color, specularFactor);
+    var specularColor = scaleVec3(light_color, specularFactor);
 
-    rayColor = addVec3(rayColor, addVec3(extendVec3(surfaceColor, diffuseFactor), specularColor));
+    rayColor = addVec3(rayColor, addVec3(scaleVec3(surfaceColor, diffuseFactor), specularColor));
     return rayColor;
 }
 
@@ -123,7 +124,7 @@ function traceRay(ray) {
     var objIndex = -1;
     for (var i = 0; i < scene.length; i++) {
         var objT = intersect(ray, scene[i]);
-        if (objT < inf) { //select nearest hit
+        if (objT < t) { //select nearest hit
             t = objT;
             objIndex = i;
         }
@@ -134,19 +135,19 @@ function traceRay(ray) {
     //ray did hit something    
     var obj = scene[objIndex];
     // Find the point of intersection on the object.
-    var M = addVec3(ray.origin, extendVec3(ray.direction, t));
+    var M = addVec3(ray.origin, scaleVec3(ray.direction, t));
     // Find properties of the object.
     var N = getNormal(obj, M);
     var surfaceColor = getColor(obj, M);
     var toL = normalize(subVec3(lightPos, M)); //zum licht
     var toO = normalize(subVec3(O, M));
-    if (castShadows !== 0) {
+    if (castShadows == 1) {
         // Shadow: find if the point is shadowed or not.
-        var shadowRay = createRay(addVec3(M, extendVec3(N, 0.001)), toL);
+        var shadowRay = createRay(addVec3(M, scaleVec3(N, 0.001)), toL);
         for (var i = 0; i < scene.length; i++) {
             if (i !== objIndex) {
-                var objT = intersect(ray, scene[i]);
-                if (objT < inf) {
+                var objT = intersect(shadowRay, scene[i]);
+                if (objT < inf) {                
                     return; //shadow ray hit something -> shadow
                 }
             }
@@ -171,6 +172,9 @@ function render(maxDepth) {
     var start_ms = new Date().getTime();
     //fetch settings
     shaderType = document.getElementsByName('shaderType')[0].value;
+    castShadows = document.getElementsByName('castShadows')[0].value;
+    width = document.getElementsByName('imageWidth')[0].value;
+    height = document.getElementsByName('imageHeight')[0].value;
     //create background image
     var pixelData = createBackgroundImage();
     var r = width / height;
@@ -205,8 +209,8 @@ function render(maxDepth) {
         }
     }
     displayImage(pixelData);
-    
+
     var end_ms = new Date().getTime();
     var passedTime_ms = end_ms - start_ms;
-    println("Finished in: " + passedTime_ms/1000 + " seconds");
+    println("Finished in: " + passedTime_ms / 1000 + " seconds");
 }

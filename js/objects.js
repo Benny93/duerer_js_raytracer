@@ -34,7 +34,7 @@ function addVec3(A, B) {
         A.z + B.z)
 }
 
-function extendVec3(A, factor) {
+function scaleVec3(A, factor) {
     return Vec3(
         A.x * factor,
         A.y * factor,
