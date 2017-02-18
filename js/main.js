@@ -1,3 +1,4 @@
+//set default image
 window.onload = function () {
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
@@ -39,7 +40,7 @@ var scene = [
             add_plane(Vec3(0, -0.5, 0), Vec3(0, 1, 0))
             ];
 
-
+//intersections
 function intersectPlane(ray, position, normal) {
     //denominator
     var denom = dot(ray.direction, normal);
@@ -94,7 +95,7 @@ function intersect(ray, obj) {
         return intersectSphere(ray, obj.position, obj.radius);
     }
 }
-
+//shading
 function getNormal(obj, intersectionPoint) {
     if (obj.type.localeCompare("plane") == 0) {
         return obj.normal;
@@ -128,6 +129,20 @@ function shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor) {
 
 function shadeDebug(N) {
     return Vec3(Math.abs(N.x) * 255, Math.abs(N.y) * 255, Math.abs(N.z) * 255);
+}
+
+function shadeToon(N, toL, toO, surfaceColor) {
+    var LdotN = dot(toL, N);
+    if (LdotN < 0.2) {
+        return Vec3(0, 0, 0);
+    }
+    //    var specularFactor = Math.pow(Math.max(dot(N, normalize(addVec3(toL, toO))), 0), specular_k);
+    var specularFactor = Math.max(dot(N, normalize(addVec3(toL, toO))), 0);
+    var specularColor = Vec3(0, 0, 0);
+    if (specularFactor > 0.98) {        
+        specularColor = scaleVec3(light_color, specularFactor);
+    }
+    return addVec3(surfaceColor, specularColor);
 }
 
 function traceRay(ray) {
@@ -167,11 +182,22 @@ function traceRay(ray) {
     //no shadow
     //Start computing the color.
     var rayColor;
-    if (shaderType == 1) {
-        rayColor = shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor);
-    } else {
-        rayColor = shadeDebug(N);
+    switch (shaderType) {
+        case "0":
+            rayColor = shadeDebug(N);
+            break;
+        case "1":
+            rayColor = shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor);
+            break;
+        case "2":
+            rayColor = shadeToon(N, toL, toO, surfaceColor);
+            break;
+        default:
+            rayColor = shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor);
+            break;
     }
+
+
     return hit(obj, M, N, rayColor);
 }
 
