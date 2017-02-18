@@ -9,20 +9,20 @@ function getCurrentTime() {
     return datetime;
 }
 
-function createBackgroundImage() {    
+function createBackgroundImage() {
     var pixelData = [];
-    var nom = 230/height;
+    var nom = 230 / height;
     for (var x = 0; x < width; x++) {
         pixelData[x] = [];
         for (var y = 0; y < height; y++) {
-            pixelData[x][y] = color(0,0,230-y*nom);            
+            pixelData[x][y] = color(0, 0, 230 - y * nom);
         }
     }
     return pixelData;
 }
 
 /*Displays image*/
-function displayImage(pixelData){
+function displayImage(pixelData) {
     var c2 = document.getElementById("myCanvas");
     c2.width = width;
     c2.height = height;
@@ -32,12 +32,12 @@ function displayImage(pixelData){
     c1.width = width;
     c1.height = height;
     var ctx1 = c1.getContext("2d");
-    
+
 
     var imgData = ctx1.createImageData(width, height);
     for (var i = 0; i < imgData.data.length; i += 4) {
         var x = (i / 4) % width;
-        var y = Math.floor(i / (4*width));
+        var y = Math.floor(i / (4 * width));
         imgData.data[i] = pixelData[x][y].r;
         imgData.data[i + 1] = pixelData[x][y].g;
         imgData.data[i + 2] = pixelData[x][y].b;
@@ -45,6 +45,13 @@ function displayImage(pixelData){
     }
     ctx1.putImageData(imgData, 0, 0);
     //debug stretch image
+//    if (height >= 100) {
+//        c2.width = width;
+//        c2.height = height;
+//    } else {
+//        c2.width = width * 10;
+//        c2.height = height * 10;
+//    }  
     c2.width = 400;
     c2.height = 300;
 

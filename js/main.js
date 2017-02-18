@@ -1,3 +1,14 @@
+window.onload = function () {
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    var img = new Image();
+    img.src = "img/duerer.jpg";
+    img.onload = function () {
+        ctx.drawImage(img, 0, 0, img.width, img.height,
+            0, 0, canvas.width, canvas.height);
+    };
+
+};
 //settings, some will be overritten by ui
 var width = 40; //400x300
 var height = 30;
@@ -104,10 +115,10 @@ function getColor(obj, intersectionPoint) {
 }
 
 function shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor) {
-    var rayColor = scaleVec3(surfaceColor, ambient);    
+    var rayColor = scaleVec3(surfaceColor, ambient);
     // Lambert shading (diffuse). -> diffuseColor * cos(theta) * color
     var NtoL = dot(N, toL);
-     var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
+    var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
     var specularFactor = obj.specular_c * Math.pow(Math.max(dot(N, normalize(addVec3(toL, toO))), 0), specular_k);
     var specularColor = scaleVec3(light_color, specularFactor);
 
@@ -165,7 +176,7 @@ function traceRay(ray) {
 }
 
 function render(maxDepth) {
-    clearLog();    
+    clearLog();
     printInfo(scene);
     var start_ms = new Date().getTime();
     //fetch settings
@@ -184,7 +195,7 @@ function render(maxDepth) {
     for (var x = 0; x < width; x++) {
         for (var y = 0; y < height; y++) {
             //camera direction
-            imagePlanePoint = Vec3(S[0] + xStepSize * x, S[3] - yStepSize * y, 0);                       
+            imagePlanePoint = Vec3(S[0] + xStepSize * x, S[3] - yStepSize * y, 0);
             var depth = 0;
             var D = normalize(subVec3(imagePlanePoint, O));
             var ray = createRay(O, D);
