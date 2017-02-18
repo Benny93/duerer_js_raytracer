@@ -2,6 +2,8 @@ var defaultBlack = Vec3(0, 0, 0);
 var defaultWhite = Vec3(255, 255, 255);
 var defaultBlue = Vec3 (0,0,255);
 var defaultBrown = Vec3(130,82,1);
+
+//Vectors and Vector calculation
 function Vec3(x, y, z) {
     return {
         "x": x,
@@ -61,6 +63,11 @@ function hit(obj, hitPoint, normal, rayColor) {
     }
 }
 
+function toStrVec3(A){
+     return "{" + A.x + ", " + A.y + ", " + A.z  + "}";
+}
+//Color
+
 function color(_r, _g, _b) {
     return {
         "r": _r,
@@ -69,7 +76,7 @@ function color(_r, _g, _b) {
     }
 }
 
-
+//Scene Objects 
 var planeCheckBoard =
     function getPlaneColorAtPoint(point) {
         /*printVec3(point);
@@ -82,8 +89,6 @@ var planeCheckBoard =
         }        
     }
 
-
-//TODO: chess color of plane
 function add_plane(position, normal) {
     return {
         "type": "plane",

@@ -13,14 +13,13 @@ window.onerror = function (error, url, line) {
     println(error + ' at ln ' + line);
 }
 
-function printInfo() {
-    println('Light pos ' + lightPos.y);
-    var A = Vec3(1, 1, 1);
-    var dotA = dot(A, A);
-    println("Shader Type " + shaderType);
+function printInfo(scene) {
+    println('Light at ' + toStrVec3(lightPos));    
+    println('Camera at ' + toStrVec3(O));
+    for(var i = 0; i < scene.length ; i++){
+        println(scene[i].type + " at " + toStrVec3(scene[i].position));
+    }
+    println('Time: ' + getCurrentTime());
+    println('Redering!');
 }
 
-function printVec3(vector){
-    var vectorStr = "{" + vector.x + ", " + vector.y + ", " + vector.z  + "}";
-    println(vectorStr);
-}

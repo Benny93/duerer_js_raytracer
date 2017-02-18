@@ -27,12 +27,14 @@
         </div>
         
         <div id="rightColumn">             
+            Preset:<input type="text" name="preset" value="0">
+            <button onclick="inputButtonPressedSetPreset()">SetPreset</button>
             wdith:<input type="text" name="imageWidth" value="40">
             height:<input type="text" name="imageHeight" value="30">
             Shadows:(1=true)<input type="text" name="castShadows" value="1">
             Depth:<input type="text" name="renderDepth" value="1">
             ShaderType: <input type="text" name="shaderType" value="1">
-             <button onclick="render(document.getElementsByName('renderDepth')[0].value )">Render!</button> 
+             <button onclick="inputButtonPressedRender()">Render!</button> 
             <div style="font-family:'Courier New'" id="log">Console:</div>
         </div>
     </div>
@@ -41,8 +43,7 @@
     <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
     <script>
         window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')
-    </script>
-    <script src="js/plugins.js"></script>
+    </script>    
     <script src="js/objects.js"></script>
     <script src="js/util.js"></script>
     <script src="js/printer.js"></script>

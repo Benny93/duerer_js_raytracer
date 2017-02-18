@@ -27,7 +27,7 @@ var scene = [
             add_sphere(Vec3(-1.2, 0.8, 1.5), 0.6, Vec3(255, 0, 0)),
             add_plane(Vec3(0, -0.5, 0), Vec3(0, 1, 0))
             ];
-//.75, .1, 1.], .6, [0., 0., 1.]
+
 
 function intersectPlane(ray, position, normal) {
     //denominator
@@ -107,8 +107,7 @@ function shadeDiffuseBlinn(obj, N, toL, toO, surfaceColor) {
     var rayColor = scaleVec3(surfaceColor, ambient);    
     // Lambert shading (diffuse). -> diffuseColor * cos(theta) * color
     var NtoL = dot(N, toL);
-    //printVec3(M);    
-    var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
+     var diffuseFactor = obj.diffuse_c * Math.max(NtoL, 0);
     var specularFactor = obj.specular_c * Math.pow(Math.max(dot(N, normalize(addVec3(toL, toO))), 0), specular_k);
     var specularColor = scaleVec3(light_color, specularFactor);
 
@@ -166,10 +165,8 @@ function traceRay(ray) {
 }
 
 function render(maxDepth) {
-    clearLog();
-    println('Time: ' + getCurrentTime());
-    println('Redering with depth ' + maxDepth + '!');
-    printInfo();
+    clearLog();    
+    printInfo(scene);
     var start_ms = new Date().getTime();
     //fetch settings
     shaderType = document.getElementsByName('shaderType')[0].value;
@@ -187,8 +184,7 @@ function render(maxDepth) {
     for (var x = 0; x < width; x++) {
         for (var y = 0; y < height; y++) {
             //camera direction
-            imagePlanePoint = Vec3(S[0] + xStepSize * x, S[3] - yStepSize * y, 0);
-            //println(imagePlanePoint.x + ", " + imagePlanePoint.y);           
+            imagePlanePoint = Vec3(S[0] + xStepSize * x, S[3] - yStepSize * y, 0);                       
             var depth = 0;
             var D = normalize(subVec3(imagePlanePoint, O));
             var ray = createRay(O, D);
