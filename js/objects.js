@@ -1,7 +1,7 @@
 var defaultBlack = Vec3(0, 0, 0);
 var defaultWhite = Vec3(255, 255, 255);
 var defaultBlue = Vec3 (0,0,255);
-
+var defaultBrown = Vec3(130,82,1);
 function Vec3(x, y, z) {
     return {
         "x": x,
@@ -78,7 +78,7 @@ var planeCheckBoard =
         if ((Math.floor(Math.abs(point.x) * 2) % 2) == (Math.floor(Math.abs(point.z) * 2) % 2)) {          
             return defaultWhite;
         } else {
-            return defaultBlue;
+            return defaultBlack;
         }        
     }
 
