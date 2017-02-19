@@ -133,9 +133,13 @@ function shadeDebug(N) {
 
 function shadeToon(N, toL, toO, surfaceColor) {
     var LdotN = dot(toL, N);
-    if (LdotN < 0.2) {
+    var OdotN = dot(toO, N);
+    if (LdotN < 0.2 || OdotN < 0.2) {
         return Vec3(0, 0, 0);
     }
+//    if (LdotN < 0.3){
+//        return Vec3(50, 50, 50);
+//    }
     //    var specularFactor = Math.pow(Math.max(dot(N, normalize(addVec3(toL, toO))), 0), specular_k);
     var specularFactor = Math.max(dot(N, normalize(addVec3(toL, toO))), 0);
     var specularColor = Vec3(0, 0, 0);
